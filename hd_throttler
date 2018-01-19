@@ -3,7 +3,7 @@
 ACTUATED_ONLINE='?'
 
 function read_status {
-  cat /sys/class/power_supply/ADP1/online
+  return `cat /sys/class/power_supply/ADP1/online`
 }
 
 function actuate_status {
@@ -17,14 +17,21 @@ function actuate_status {
       ;;
     esac
   fi
-  echo $1
+  return $1
 }
 
 while [ 1 ]; do
-  ONLINE=`read_status`
+  read_status
+  ONLINE=$?
+
   OLD_AO=$ACTUATED_ONLINE
-  ACTUATED_ONLINE=`actuate_status $ONLINE`
-  # echo "${ONLINE}: ${OLD_AO} <- ${ACTUATED_ONLINE}"
+
+  actuate_status $ONLINE
+  ACTUATED_ONLINE=$?
+  if [ "$OLD_AO" != "$ACTUATED_ONLINE" ]; then
+    echo "${ONLINE}: ${OLD_AO} <- ${ACTUATED_ONLINE}"
+  fi
+
   T1=`date +%s`
   sleep 10
   T2=`date +%s`
