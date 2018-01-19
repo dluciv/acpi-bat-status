@@ -1,0 +1,11 @@
+[Unit]
+Description=Fix HDD Power Management
+After=default.target
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/hd_throttler
+Restart=always
+
+[Install]
+WantedBy=default.target
