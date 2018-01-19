@@ -1,0 +1,36 @@
+#!/bin/bash
+
+ACTUATED_ONLINE='?'
+
+function read_status {
+  cat /sys/class/power_supply/ADP1/online
+}
+
+function actuate_status {
+  if [ "$ACTUATED_ONLINE" != "$1" ]; then
+    case "$1" in
+      "0")
+        hdparm -B 125 -S 36 /dev/sda >/dev/null
+      ;;
+      "1")
+        hdparm -B 254 -S 0  /dev/sda >/dev/null
+      ;;
+    esac
+  fi
+  echo $1
+}
+
+while [ 1 ]; do
+  ONLINE=`read_status`
+  OLD_AO=$ACTUATED_ONLINE
+  ACTUATED_ONLINE=`actuate_status $ONLINE`
+  # echo "${ONLINE}: ${OLD_AO} <- ${ACTUATED_ONLINE}"
+  T1=`date +%s`
+  sleep 10
+  T2=`date +%s`
+  if (( $T2 - $T1 > 15 )); then
+    # was likely suspended
+    echo Was Likely Suspended
+    ACTUATED_ONLINE='?'
+  fi
+done
