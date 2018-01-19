@@ -10,10 +10,10 @@ function actuate_status {
   if [ "$ACTUATED_ONLINE" != "$1" ]; then
     case "$1" in
       "0")
-        hdparm -B 125 -S 36 /dev/sda >/dev/null
+        hdparm -B 125 -S 36 /dev/sda
       ;;
       "1")
-        hdparm -B 254 -S 0  /dev/sda >/dev/null
+        hdparm -B 254 -S 0  /dev/sda
       ;;
     esac
   fi
